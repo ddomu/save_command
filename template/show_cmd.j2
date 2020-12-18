@@ -1,0 +1,10 @@
+# {{inventory_hostname}}
+
+{% for command, result in kv.items() %}
+{% for i in range (1,100) %}={% endfor %}
+
+## {{command}}
+{% for i in range (1,100) %}={% endfor %}
+
+{{result}}
+{% endfor %}

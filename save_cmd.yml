@@ -1,0 +1,38 @@
+---
+# SWT COMMAND RESULT 
+- name: SAVE COMMAND RESULT FOR NXOS / IOS DEVICES  
+  hosts: 
+  connection: network_cli
+  gather_facts: no
+
+  vars:
+    cmd:
+    - show version
+    - show module 
+    - show fex
+    - show feature
+    - show license usage
+    - show license host-id
+    - show vpc brief
+    - show interface status
+    timestamp: "{{ lookup('pipe', 'date +\"%H%M\"')}}" 
+
+  roles: 
+  - role: backup_config
+    vars:
+      dest_dir: "./result"
+  
+  tasks: 
+  - name: RUN MULTIPLE COMMANDS ON NXOS 
+    ios_command:
+      commands: "{{cmd}}"
+    register: output   # output.stdout = ['cmd1','cmd2']
+
+  - name: SET_FACT DICT  
+    set_fact: 
+      kv: "{{  dict(cmd | zip(output.stdout)) }}"  
+
+  - name: COMMAND RESULT SAVE
+    template:
+      src: ./template/show_cmd.j2
+      dest: ./result/{{inventory_hostname}}_{{timestamp}}.md
